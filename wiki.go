@@ -6,17 +6,15 @@ import (
   "net/http"
 )
 
-// allows users to view a wiki page
-func viewHandler(w http.ResponseWriter, r *http.Request) {
-  // extracts page title from path
-  // slices path to drop view
-    title := r.URL.Path[len("/view/"):]
-    // loads page data
-    p, _ := loadPage(title)
-    // formats page to html
-    // writes to w
-    t, _ := template.ParseFiles("view.html")
+func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
+    t, _ := template.ParseFiles(tmpl + ".html")
     t.Execute(w, p)
+}
+
+func viewHandler(w http.ResponseWriter, r *http.Request) {
+    title := r.URL.Path[len("/view/"):]
+    p, _ := loadPage(title)
+    renderTemplate(w, "view", p)
 }
 
 // this struct describes how
@@ -60,12 +58,7 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         p = &Page{Title: title}
     }
-    // function reads contents of file and returns
-    // a *template
-    t, _ := template.ParseFiles("edit.html")
-    // executes the template, writing html to 
-    // http.ResponseWriter
-    t.Execute(w, p)
+    renderTemplate(w, "edit", p)
 }
 
 func main() {
