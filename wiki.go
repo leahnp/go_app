@@ -1,7 +1,7 @@
 package main
 
 import (
-  "fmt"
+  "html/template"
   "io/ioutil"
   "net/http"
 )
@@ -15,7 +15,8 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
     p, _ := loadPage(title)
     // formats page to html
     // writes to w
-    fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", p.Title, p.Body)
+    t, _ := template.ParseFiles("view.html")
+    t.Execute(w, p)
 }
 
 // this struct describes how
@@ -59,22 +60,14 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         p = &Page{Title: title}
     }
-    fmt.Fprintf(w, "<h1>Editing %s</h1>"+
-        "<form action=\"/save/%s\" method=\"POST\">"+
-        "<textarea name=\"body\">%s</textarea><br>"+
-        "<input type=\"submit\" value=\"Save\">"+
-        "</form>",
-        p.Title, p.Title, p.Body)
+    // function reads contents of file and returns
+    // a *template
+    t, _ := template.ParseFiles("edit.html")
+    // executes the template, writing html to 
+    // http.ResponseWriter
+    t.Execute(w, p)
 }
 
-// compiles and executes code, creates testpage.tct
-// func main() {
-//     p1 := &Page{Title: "TestPage", Body: []byte("This is a sample Page.")}
-//     p1.save()
-//     p2, _ := loadPage("TestPage")
-//     fmt.Println(string(p2.Body))
-// }
-// version with views
 func main() {
     http.HandleFunc("/view/", viewHandler)
     http.HandleFunc("/edit/", editHandler)
