@@ -34,6 +34,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
     title := r.URL.Path[len("/view/"):]
     p, err := loadPage(title)
     if err != nil {
+        // adds http status code 302 and a location header
         http.Redirect(w, r, "/edit/"+title, http.StatusFound)
         return
     }
@@ -47,6 +48,14 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
         p = &Page{Title: title}
     }
     renderTemplate(w, "edit", p)
+}
+
+func saveHandler(w http.ResponseWriter, r *http.Request) {
+    title := r.URL.Path[len("/save/"):]
+    body := r.FormValue("body")
+    p := &Page{Title: title, Body: []byte(body)}
+    p.save()
+    http.Redirect(w, r, "/view/"+title, http.StatusFound)
 }
 
 func main() {
