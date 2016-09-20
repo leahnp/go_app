@@ -11,7 +11,7 @@ import (
 
 // global var, initialized with ParseFiles
 // must list all templates here
-var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
+var templates = template.Must(template.ParseFiles("templates/edit.html", "templates/view.html"))
 // returns error if not valid path
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 
